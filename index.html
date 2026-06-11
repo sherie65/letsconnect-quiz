@@ -1,0 +1,922 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Is Your Event Leaking Revenue? | Let's Connect</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --teal: #1a5c5a;
+    --teal-dark: #0f3836;
+    --teal-light: #e8f3f2;
+    --gold: #c9993a;
+    --gold-light: #f7edd8;
+    --cream: #faf7f2;
+    --cream-dark: #f0ebe1;
+    --text: #1a1917;
+    --text-muted: #6b6860;
+    --text-light: #9e9b94;
+    --white: #ffffff;
+    --radius: 16px;
+    --radius-sm: 8px;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--cream);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1rem;
+  }
+
+  /* BACKGROUND DECORATION */
+  body::before {
+    content: '';
+    position: fixed;
+    top: -200px;
+    right: -200px;
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, rgba(201,153,58,0.08) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  body::after {
+    content: '';
+    position: fixed;
+    bottom: -200px;
+    left: -200px;
+    width: 500px;
+    height: 500px;
+    background: radial-gradient(circle, rgba(26,92,90,0.07) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .quiz-shell {
+    width: 100%;
+    max-width: 640px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* PROGRESS BAR */
+  .progress-wrap {
+    margin-bottom: 2rem;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+  }
+
+  .progress-wrap.visible { opacity: 1; }
+
+  .progress-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: var(--text-light);
+    margin-bottom: 8px;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+
+  .progress-track {
+    height: 3px;
+    background: var(--cream-dark);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--teal), var(--gold));
+    border-radius: 2px;
+    transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    width: 0%;
+  }
+
+  /* CARD */
+  .card {
+    background: var(--white);
+    border-radius: var(--radius);
+    padding: 3rem;
+    box-shadow: 0 4px 24px rgba(26,92,90,0.08), 0 1px 4px rgba(0,0,0,0.04);
+    animation: slideUp 0.5s cubic-bezier(0.4, 0, 0.2, 1) both;
+  }
+
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .card.exiting {
+    animation: slideOut 0.3s cubic-bezier(0.4, 0, 0.2, 1) both;
+  }
+
+  @keyframes slideOut {
+    from { opacity: 1; transform: translateY(0); }
+    to { opacity: 0; transform: translateY(-20px); }
+  }
+
+  /* INTRO */
+  .brand-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--teal);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 1.5rem;
+  }
+
+  .brand-tag::before {
+    content: '';
+    display: block;
+    width: 24px;
+    height: 2px;
+    background: var(--gold);
+  }
+
+  .intro-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(2rem, 5vw, 3rem);
+    font-weight: 600;
+    line-height: 1.1;
+    color: var(--teal-dark);
+    margin-bottom: 1rem;
+    letter-spacing: -0.5px;
+  }
+
+  .intro-title em {
+    font-style: italic;
+    color: var(--gold);
+  }
+
+  .intro-body {
+    font-size: 16px;
+    line-height: 1.7;
+    color: var(--text-muted);
+    margin-bottom: 2rem;
+  }
+
+  .intro-meta {
+    display: flex;
+    gap: 1.5rem;
+    margin-bottom: 2.5rem;
+  }
+
+  .meta-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: var(--text-light);
+  }
+
+  .meta-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--gold);
+    flex-shrink: 0;
+  }
+
+  /* QUESTION */
+  .question-eyebrow {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--gold);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-bottom: 0.75rem;
+  }
+
+  .question-text {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(1.3rem, 3vw, 1.75rem);
+    font-weight: 500;
+    line-height: 1.3;
+    color: var(--teal-dark);
+    margin-bottom: 2rem;
+  }
+
+  .options-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .option {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 16px 18px;
+    border: 1.5px solid var(--cream-dark);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background: var(--white);
+    text-align: left;
+    width: 100%;
+  }
+
+  .option:hover {
+    border-color: var(--teal);
+    background: var(--teal-light);
+    transform: translateX(4px);
+  }
+
+  .option.selected {
+    border-color: var(--teal);
+    background: var(--teal-light);
+  }
+
+  .option-letter {
+    flex-shrink: 0;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--cream-dark);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-muted);
+    transition: all 0.2s ease;
+    margin-top: 1px;
+  }
+
+  .option:hover .option-letter,
+  .option.selected .option-letter {
+    background: var(--teal);
+    color: var(--white);
+  }
+
+  .option-text {
+    font-size: 15px;
+    line-height: 1.5;
+    color: var(--text);
+  }
+
+  /* EMAIL CAPTURE */
+  .capture-eyebrow {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--gold);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-bottom: 0.75rem;
+  }
+
+  .capture-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(1.5rem, 3vw, 2rem);
+    font-weight: 600;
+    color: var(--teal-dark);
+    margin-bottom: 0.75rem;
+    line-height: 1.2;
+  }
+
+  .capture-body {
+    font-size: 15px;
+    color: var(--text-muted);
+    line-height: 1.6;
+    margin-bottom: 2rem;
+  }
+
+  .form-field {
+    margin-bottom: 1rem;
+  }
+
+  .form-field label {
+    display: block;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 6px;
+  }
+
+  .form-field input {
+    width: 100%;
+    padding: 14px 16px;
+    border: 1.5px solid var(--cream-dark);
+    border-radius: var(--radius-sm);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    color: var(--text);
+    background: var(--cream);
+    outline: none;
+    transition: border-color 0.2s ease;
+  }
+
+  .form-field input:focus {
+    border-color: var(--teal);
+    background: var(--white);
+  }
+
+  .capture-note {
+    font-size: 12px;
+    color: var(--text-light);
+    margin-top: 0.75rem;
+    margin-bottom: 2rem;
+  }
+
+  /* RESULTS */
+  .result-badge {
+    display: inline-block;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    margin-bottom: 1.5rem;
+  }
+
+  .badge-red { background: #fee2e2; color: #991b1b; }
+  .badge-yellow { background: #fef3c7; color: #92400e; }
+  .badge-green { background: #dcfce7; color: #14532d; }
+
+  .result-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(1.75rem, 4vw, 2.5rem);
+    font-weight: 600;
+    color: var(--teal-dark);
+    line-height: 1.15;
+    margin-bottom: 0.5rem;
+  }
+
+  .result-subtitle {
+    font-size: 16px;
+    font-style: italic;
+    color: #8a6520;
+    margin-bottom: 1.5rem;
+    font-family: 'Cormorant Garamond', serif;
+  }
+
+  .result-divider {
+    width: 48px;
+    height: 2px;
+    background: linear-gradient(90deg, var(--teal), var(--gold));
+    margin-bottom: 1.5rem;
+  }
+
+  .result-body {
+    font-size: 15px;
+    line-height: 1.75;
+    color: var(--text-muted);
+    margin-bottom: 1.5rem;
+  }
+
+  .result-list {
+    background: var(--cream);
+    border-radius: var(--radius-sm);
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .result-list-title {
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-muted);
+    margin-bottom: 0.75rem;
+  }
+
+  .result-list-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-size: 14px;
+    color: var(--text);
+    line-height: 1.5;
+    margin-bottom: 8px;
+  }
+
+  .result-list-item:last-child { margin-bottom: 0; }
+
+  .result-list-item::before {
+    content: '';
+    flex-shrink: 0;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--gold);
+    margin-top: 6px;
+  }
+
+  .result-next {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--teal);
+    margin-bottom: 1.5rem;
+  }
+
+  .cta-group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  /* BUTTONS */
+  .btn-primary {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    padding: 16px 24px;
+    background: var(--teal);
+    color: var(--white);
+    border: none;
+    border-radius: var(--radius-sm);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    text-align: center;
+  }
+
+  .btn-primary:hover {
+    background: var(--teal-dark);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 16px rgba(26,92,90,0.25);
+  }
+
+  .btn-secondary {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: 14px 24px;
+    background: transparent;
+    color: var(--teal);
+    border: 1.5px solid var(--teal);
+    border-radius: var(--radius-sm);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    text-align: center;
+  }
+
+  .btn-secondary:hover {
+    background: var(--teal-light);
+    transform: translateY(-1px);
+  }
+
+  .btn-gold {
+    background: var(--gold);
+    color: var(--white);
+  }
+
+  .btn-gold:hover {
+    background: #b8882e;
+    box-shadow: 0 4px 16px rgba(201,153,58,0.3);
+  }
+
+  /* NAV */
+  .nav-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 2rem;
+  }
+
+  .btn-back {
+    background: none;
+    border: none;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    color: var(--text-muted);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 0;
+    transition: color 0.2s;
+  }
+
+  .btn-back:hover { color: var(--text); }
+
+  /* FOOTER */
+  .quiz-footer {
+    text-align: center;
+    margin-top: 1.5rem;
+    font-size: 12px;
+    color: var(--text-light);
+  }
+
+  .quiz-footer a {
+    color: var(--teal);
+    text-decoration: none;
+  }
+
+  /* SCORE DISPLAY */
+  .score-ring {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--teal), var(--gold));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+  }
+
+  .score-ring-inner {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: var(--white);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .score-number {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--teal-dark);
+    line-height: 1;
+  }
+
+  .score-label {
+    font-size: 9px;
+    color: var(--text-light);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  @media (max-width: 480px) {
+    .card { padding: 2rem 1.5rem; }
+    .intro-meta { flex-direction: column; gap: 0.5rem; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { animation: none !important; transition: none !important; }
+  }
+</style>
+</head>
+<body>
+<div class="quiz-shell">
+  <div class="progress-wrap" id="progressWrap">
+    <div class="progress-label">
+      <span id="progressText">Question 1 of 7</span>
+      <span id="progressPct">0%</span>
+    </div>
+    <div class="progress-track">
+      <div class="progress-fill" id="progressFill"></div>
+    </div>
+  </div>
+
+  <div class="card" id="quizCard"></div>
+
+  <div class="quiz-footer" id="quizFooter">
+    <a href="https://mosaicapps.co" target="_blank">Let's Connect by Mosaic Apps</a>
+  </div>
+</div>
+
+<script>
+const questions = [
+  {
+    q: "After your last event, what percentage of attendees came back for your next one?",
+    options: [
+      { text: "More than 60% — my community is loyal", pts: 3 },
+      { text: "Around 30-60% — decent but I know I'm losing some", pts: 2 },
+      { text: "Less than 30% — I'm basically starting over every time", pts: 1 },
+      { text: "I honestly don't track this", pts: 1 }
+    ]
+  },
+  {
+    q: "How do your attendees typically follow up with the connections they make at your events?",
+    options: [
+      { text: "We have a system — they use a tool or platform I provide", pts: 3 },
+      { text: "They exchange cards or LinkedIn info and handle it themselves", pts: 2 },
+      { text: "Honestly I have no idea what happens after they leave", pts: 1 },
+      { text: "Most connections probably don't go anywhere", pts: 1 }
+    ]
+  },
+  {
+    q: "When you pitch sponsors or talk about your events to funders, what's your strongest selling point?",
+    options: [
+      { text: "The experience I create — my events are intentional and attendees leave with real value", pts: 3 },
+      { text: "My attendance numbers and the energy in the room", pts: 2 },
+      { text: "Honestly I lead with the event itself — I don't have much to show beyond that", pts: 1 },
+      { text: "I haven't approached sponsors or funding yet", pts: 1 }
+    ]
+  },
+  {
+    q: "How do you keep your community engaged between events?",
+    options: [
+      { text: "I have a consistent system — newsletter, community platform, regular touchpoints", pts: 3 },
+      { text: "I post on social media and have a group chat but it's inconsistent", pts: 2 },
+      { text: "Mostly I just promote the next event when it's coming up", pts: 1 },
+      { text: "I don't have anything in place between events", pts: 1 }
+    ]
+  },
+  {
+    q: "When an attendee doesn't come back, what's your best guess why?",
+    options: [
+      { text: "Rarely happens — when it does it's usually scheduling or budget", pts: 3 },
+      { text: "They probably meant to but lost momentum after the event", pts: 2 },
+      { text: "The connections they made didn't go anywhere so there was no reason to return", pts: 1 },
+      { text: "I'm not sure — I don't have a way to find out", pts: 1 }
+    ]
+  },
+  {
+    q: "How would you describe the follow-up experience for your attendees after your events?",
+    options: [
+      { text: "Structured — they leave with clear next steps and tools to stay connected", pts: 3 },
+      { text: "Encouraged but not supported — I tell them to follow up but don't give them a way to do it", pts: 2 },
+      { text: "Nonexistent — what happens after the event is up to them", pts: 1 }
+    ]
+  },
+  {
+    q: "Be honest — how confident are you that your attendees are building lasting connections at your events?",
+    options: [
+      { text: "Very confident — I hear about it regularly and see the relationships forming", pts: 3 },
+      { text: "Somewhat confident — some connections stick but most probably fade", pts: 2 },
+      { text: "Not confident at all — I hope it's happening but I have no way to know", pts: 1 }
+    ]
+  }
+];
+
+const results = [
+  {
+    range: [7, 11],
+    badge: "badge-red",
+    badgeText: "The Leaky Bucket",
+    title: "Your event community is leaking revenue.",
+    subtitle: "And it's not your fault.",
+    body: "You're putting incredible work into building a room full of the right people. But without a system to keep those connections alive after everyone goes home, your community resets with every event. Attendees leave with good intentions and a stack of contacts — and most of those connections fade within a week.",
+    costs: [
+      "Attendees who came once and won't come back because the connections they made went nowhere",
+      "Sponsors who choose events that offer a more intentional attendee experience over yours",
+      "Momentum that builds during your event and disappears by Monday morning"
+    ],
+    closing: "The good news: this is fixable. And it doesn't require starting over — it requires closing the gap between the energy in the room and what happens after everyone leaves.",
+    next: "See exactly how Let's Connect closes that gap for event organizers like you — in under 2 minutes."
+  },
+  {
+    range: [12, 16],
+    badge: "badge-yellow",
+    badgeText: "The Slow Drip",
+    title: "Your community has real potential.",
+    subtitle: "But you're leaving retention on the table.",
+    body: "You're doing better than most. Some of your attendees come back, your community has momentum, and you're clearly building something worth returning to. But there's a gap between the connections happening in the room and what survives after the event ends — and that gap is quietly costing you repeat attendance and long-term growth.",
+    costs: [
+      "Moving from 'some people come back' to 'most people come back'",
+      "Giving sponsors a reason to choose your event — because you've built an experience that doesn't end when the room empties",
+      "Turning the community you're already building into one that grows itself"
+    ],
+    closing: "The frustrating part is you can feel the community forming. You just don't have a system that makes it stick consistently.",
+    next: "See how event organizers at your stage are using Let's Connect to systematize what's already working — without adding more to their plate."
+  },
+  {
+    range: [17, 21],
+    badge: "badge-green",
+    badgeText: "The Thriving Community",
+    title: "You've built something real.",
+    subtitle: "Now it's time to make it scalable.",
+    body: "Your retention is strong. Your attendees come back, your community has genuine momentum, and you've clearly figured out something most event organizers are still struggling with. The challenge now isn't fixing a problem — it's sustainability. You're likely doing this through sheer effort, personal follow-up, and hustle. And that works until it doesn't scale.",
+    costs: [
+      "Freeing yourself from the manual effort of keeping your community warm between events",
+      "Giving your attendees a structured follow-up experience that reflects the quality of what you've built",
+      "Standing out to sponsors as an organizer who takes the full attendee experience seriously, not just the event itself"
+    ],
+    closing: "The next level isn't solving a retention crisis — it's systemizing what's already working so you can scale without burning out.",
+    next: "See how Let's Connect systemizes what you've already built — so you can grow it without the grind."
+  }
+];
+
+let current = 0;
+let score = 0;
+let answers = [];
+let firstName = '';
+let email = '';
+
+const card = document.getElementById('quizCard');
+const progressWrap = document.getElementById('progressWrap');
+const progressFill = document.getElementById('progressFill');
+const progressText = document.getElementById('progressText');
+const progressPct = document.getElementById('progressPct');
+
+function letters(i) { return ['A','B','C','D'][i]; }
+
+function updateProgress() {
+  if (current === 0) {
+    progressWrap.classList.remove('visible');
+    return;
+  }
+  progressWrap.classList.add('visible');
+  const pct = Math.round((current / questions.length) * 100);
+  progressFill.style.width = pct + '%';
+  progressText.textContent = current <= questions.length
+    ? `Question ${current} of ${questions.length}`
+    : 'Almost there';
+  progressPct.textContent = pct + '%';
+}
+
+function transition(renderFn) {
+  card.classList.add('exiting');
+  setTimeout(() => {
+    card.classList.remove('exiting');
+    renderFn();
+  }, 280);
+}
+
+function renderIntro() {
+  current = 0;
+  updateProgress();
+  card.innerHTML = `
+    <div class="brand-tag">Let's Connect by Mosaic Apps</div>
+    <h1 class="intro-title">Is your event <em>leaking</em> revenue?</h1>
+    <p class="intro-body">You work hard to fill the room. But what happens after everyone goes home? Take this 60-second quiz to find out if your event community is thriving — or quietly bleeding revenue between events.</p>
+    <div class="intro-meta">
+      <div class="meta-item"><div class="meta-dot"></div>7 questions</div>
+      <div class="meta-item"><div class="meta-dot"></div>60 seconds</div>
+      <div class="meta-item"><div class="meta-dot"></div>Personalized result</div>
+    </div>
+    <button class="btn-primary btn-gold" onclick="startQuiz()">
+      Get my retention score
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+    </button>
+  `;
+}
+
+function startQuiz() {
+  score = 0;
+  answers = [];
+  current = 1;
+  transition(() => renderQuestion(0));
+}
+
+function renderQuestion(idx) {
+  const q = questions[idx];
+  updateProgress();
+  card.innerHTML = `
+    <div class="question-eyebrow">Question ${idx + 1} of ${questions.length}</div>
+    <h2 class="question-text">${q.q}</h2>
+    <div class="options-grid" id="optionsGrid">
+      ${q.options.map((o, i) => `
+        <button class="option" onclick="selectAnswer(${idx}, ${i}, ${o.pts}, this)">
+          <div class="option-letter">${letters(i)}</div>
+          <div class="option-text">${o.text}</div>
+        </button>
+      `).join('')}
+    </div>
+    <div class="nav-row">
+      ${idx > 0 ? `<button class="btn-back" onclick="goBack(${idx})">← Back</button>` : '<div></div>'}
+      <div></div>
+    </div>
+  `;
+}
+
+function selectAnswer(qIdx, optIdx, pts, btn) {
+  document.querySelectorAll('.option').forEach(o => o.classList.remove('selected'));
+  btn.classList.add('selected');
+  answers[qIdx] = { optIdx, pts };
+
+  setTimeout(() => {
+    if (qIdx < questions.length - 1) {
+      current = qIdx + 2;
+      transition(() => renderQuestion(qIdx + 1));
+    } else {
+      score = answers.reduce((sum, a) => sum + a.pts, 0);
+      transition(() => renderCapture());
+    }
+  }, 400);
+}
+
+function goBack(currentIdx) {
+  current = currentIdx;
+  transition(() => renderQuestion(currentIdx - 1));
+}
+
+function renderCapture() {
+  updateProgress();
+  progressText.textContent = 'Almost there';
+  progressPct.textContent = '100%';
+  progressFill.style.width = '100%';
+
+  card.innerHTML = `
+    <div class="capture-eyebrow">Your score is ready</div>
+    <h2 class="capture-title">Where should we send your results?</h2>
+    <p class="capture-body">Enter your details below to get your Event Revenue Retention Score plus a personalized action plan.</p>
+    <div class="form-field">
+      <label>First name</label>
+      <input type="text" id="nameInput" placeholder="Your first name" autocomplete="given-name" />
+    </div>
+    <div class="form-field">
+      <label>Email address</label>
+      <input type="email" id="emailInput" placeholder="your@email.com" autocomplete="email" />
+    </div>
+    <p class="capture-note">No spam. Just your results and one actionable next step.</p>
+    <button class="btn-primary" onclick="submitCapture()">
+      See my score
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+    </button>
+    <div id="captureError" style="color:#b91c1c; font-size:13px; margin-top:8px; display:none;">Please fill in both fields to continue.</div>
+  `;
+}
+
+function submitCapture() {
+  const nameVal = document.getElementById('nameInput').value.trim();
+  const emailVal = document.getElementById('emailInput').value.trim();
+  if (!nameVal || !emailVal || !emailVal.includes('@')) {
+    document.getElementById('captureError').style.display = 'block';
+    return;
+  }
+  firstName = nameVal;
+  email = emailVal;
+
+  // Log to Google Sheets via form submit (replace with your Google Form action URL)
+  logToSheets(nameVal, emailVal, score);
+
+  transition(() => renderResult());
+}
+
+function logToSheets(name, email, score) {
+  const GOOGLE_FORM_URL = 'https://docs.google.com/forms/d/e/1FAIpQLSffYarUNa8XcZktrBEea4z63-fQaYA_UyjS9PEa1WI26EOebg/formResponse';
+  const result = getResult(score);
+
+  const formData = new FormData();
+  formData.append('entry.1344639646', name);
+  formData.append('entry.1925378218', email);
+  formData.append('entry.1343092924', score);
+  formData.append('entry.1524556548', result.badgeText);
+
+  // Silent submit — doesn't redirect
+  fetch(GOOGLE_FORM_URL, { method: 'POST', body: formData, mode: 'no-cors' })
+    .catch(() => {}); // Fail silently
+}
+
+function getResult(s) {
+  return results.find(r => s >= r.range[0] && s <= r.range[1]) || results[0];
+}
+
+function renderResult() {
+  progressWrap.classList.remove('visible');
+  const r = getResult(score);
+
+  card.innerHTML = `
+    <div class="score-ring">
+      <div class="score-ring-inner">
+        <div class="score-number">${score}</div>
+        <div class="score-label">/ 21</div>
+      </div>
+    </div>
+    <div class="result-badge ${r.badge}">${r.badgeText}</div>
+    <h2 class="result-title">${r.title}</h2>
+    <p class="result-subtitle">${r.subtitle}</p>
+    <div class="result-divider"></div>
+    <p class="result-body">
+      Hi ${firstName}. ${r.body}
+    </p>
+    <div class="result-list">
+      <div class="result-list-title">${score <= 11 ? "What this is costing you" : score <= 16 ? "What's possible for you" : "What's possible for you"}</div>
+      ${r.costs.map(c => `<div class="result-list-item">${c}</div>`).join('')}
+    </div>
+    <p class="result-body">${r.closing}</p>
+    <p class="result-next">${r.next}</p>
+    <div class="cta-group">
+      <a href="https://mosaicapps.co" target="_blank" class="btn-primary btn-gold">
+        Watch the 2-minute demo
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+      </a>
+      <a href="https://calendly.com/sherene-xuqf/30min" target="_blank" class="btn-secondary">
+        Book a free 10-minute call
+      </a>
+    </div>
+    <div style="margin-top:1.5rem; text-align:center;">
+      <button class="btn-back" onclick="transition(renderIntro)" style="margin:0 auto;">Take the quiz again</button>
+    </div>
+  `;
+}
+
+// Start
+renderIntro();
+</script>
+</body>
+</html>
